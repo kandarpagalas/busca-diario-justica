@@ -1,6 +1,7 @@
 import os
 import streamlit as st
 from streamlit import session_state as ss
+import pandas as pd
 import pendulum
 from src.diario_justica import download_caderno_judiciario, extract_processos_from_pdf
 
@@ -51,14 +52,7 @@ with st.sidebar:
             format="DD/MM/YYYY",
         )
     )
-    if ss.execucoes is not None:
-        st.download_button(
-            label="Download resultado em csv",
-            data="",
-            file_name="large_df.csv",
-            mime="text/csv",
-            use_container_width=True,
-        )
+
     st.subheader("Filtros")
     ss.only_cnpj = st.checkbox("Somente CNPJ")
     ss.only_with_value = st.checkbox("Somente com Valor da Causa")
@@ -131,6 +125,19 @@ else:
         ss.execucoes = list(
             filter(lambda x: x["valor_causa"] is not None, ss.execucoes)
         )
+
+    if ss.execucoes is not None:
+        download = st.download_button(
+            label="Download resultado em csv",
+            type="primary",
+            data=pd.DataFrame(ss.execucoes).to_csv().encode("utf-8"),
+            file_name="large_df.csv",
+            mime="text/csv",
+            use_container_width=True,
+        )
+
+    if download:
+        df = pd.DataFrame()
 
     for ex in ss.execucoes:
         if contem_siglas(ex["executado"]):

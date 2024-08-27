@@ -1,0 +1,5 @@
+selenium
+pendulum
+streamlit
+PyMuPDF
+duckduckgo_search
